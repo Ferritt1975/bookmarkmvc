@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en" data-framework="angularjs">
+  <head>
+    <meta charset="utf-8">
+    <title>AngularJS • BookmarkMVC</title>
+    <link rel="stylesheet" href="node_modules/bookmarkmvc-common/base.css">
+    <link rel="stylesheet" href="node_modules/bookmarkmvc-app-css/index.css">
+    <style>[ng-cloak] { display: none; }</style>
+  </head>
+  <body ng-app="bookmarkmvc">
+    <ng-view></ng-view>
+
+    <script type="text/ng-template" id="bookmarkmvc-index.html">
+      <section id="bookmarkapp">
+        <header id="header">
+          <h1>bookmarks</h1>
+          <form name="bookmarkForm" id="bookmark-form" ng-submit="addBookmark()">
+            <div class="url-error" data-ng-show="bookmarkForm.submitted && bookmarkForm.bookmarkURL.$error.badURL"><strong>Oops!</strong> This does not appear to be a valid URL.</div>
+            <input type="text" name="bookmarkURL" id="new-bookmark" placeholder="Enter a URL" ng-class="{submitted:bookmarkForm.submitted}" ng-model="newBookmark" ng-disabled="saving" autofocus>
+          </form>
+        </header>
+        <section id="main" ng-show="bookmarks.length" ng-cloak>
+          <ul id="bookmark-list">
+            <li ng-repeat="bookmark in bookmarks | filter:statusFilter track by $index" ng-class="{favorite: bookmark.favorite, editing: bookmark == editedBookmark}">
+              <div class="view">
+                <input class="toggle" type="checkbox" ng-model="bookmark.favorite" ng-change="toggleFavorite(bookmark)">
+                <label ng-dblclick="editBookmark(bookmark)"><a href="{{bookmark.title}}">{{bookmark.title}}</a></label>
+                <button class="destroy" ng-click="removeBookmark(bookmark)"></button>
+              </div>
+              <form ng-submit="saveEdits(bookmark, 'submit')">
+                <input class="edit" ng-trim="false" ng-model="bookmark.title" bookmark-escape="revertEdits(bookmark)" ng-blur="saveEdits(bookmark, 'blur')" bookmark-focus="bookmark == editedBookmark">
+              </form>
+            </li>
+          </ul>
+        </section>
+        <footer id="footer" ng-show="bookmarks.length" ng-cloak>
+          <span id="bookmark-count"><strong>{{favoriteCount}}</strong>
+            <ng-pluralize count="favoriteCount" when="{ one: 'favorite', other: 'favorites' }"></ng-pluralize>
+          </span>
+          <ul id="filters">
+            <li>
+              <a ng-class="{selected: status == ''} " href="#/">All</a>
+            </li>
+            <li>
+              <a ng-class="{selected: status == 'favorite'}" href="#/favorite">Favorites</a>
+            </li>
+          </ul>
+        </footer>
+      </section>
+      <footer id="info">
+        <p>Double-click to edit a bookmark</p>
+        <p>Based upon <a href="http://todomvc.com">TodoMVC</a></p>
+        <p>Credits to:
+          <a href="http://twitter.com/cburgdorf">Christoph Burgdorf</a>,
+          <a href="http://ericbidelman.com">Eric Bidelman</a>,
+          <a href="http://jacobmumm.com">Jacob Mumm</a> and
+          <a href="http://blog.igorminar.com">Igor Minar</a>
+        </p>
+      </footer>
+    </script>
+    <script src="node_modules/bookmarkmvc-common/base.js"></script>
+    <script src="node_modules/angular/angular.js"></script>
+    <script src="node_modules/angular-route/angular-route.js"></script>
+    <script src="node_modules/angular-resource/angular-resource.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/controllers/bookmarkCtrl.js"></script>
+    <script src="js/services/bookmarkStorage.js"></script>
+    <script src="js/directives/bookmarkFocus.js"></script>
+    <script src="js/directives/bookmarkEscape.js"></script>
+  </body>
+</html>
